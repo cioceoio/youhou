@@ -81,7 +81,9 @@
     "do not share my personal information": "不要分享我的个人信息",
     "manage cookies": "管理 Cookie",
     "new codespace": "新建代码空间",
+    "skip to content": "跳转到内容",
 
+    "reduced pricing for github-hosted runners usage": "降低GitHub托管运行器使用定价",
     "all jobs":"所有作业",
     "future ideas":"未来想法",
     "my stack":"我的栈",
