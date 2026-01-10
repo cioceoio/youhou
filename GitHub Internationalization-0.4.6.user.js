@@ -11387,7 +11387,7 @@
   new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
-      lastUrl = url;      
+      lastUrl = url;
       console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
       // 页面路由变化后延迟500ms翻译时间，确保DOM更新完成
       setTimeout(translateTime, 500);
@@ -11682,24 +11682,23 @@
     // 创建观察者实例
     const observer = new m(function (mutations, observer) {
       // 遍历所有突变记录
-      for(let mutationRecord of mutations) {
-        // 如果有新增节点或属性变化，对突变的目标元素进行翻译
-        if (mutationRecord.addedNodes || mutationRecord.type === 'attributes') {
-          traverseElement(mutationRecord.target);
-
-          // 特别处理时间元素：新增的time元素需要翻译
-          if (mutationRecord.addedNodes) {
-            for (let node of mutationRecord.addedNodes) {
-              if (node.nodeType === Node.ELEMENT_NODE) {
-                // 查找新增节点中的time元素
-                const timeElements = node.querySelectorAll ?
-                  node.querySelectorAll('relative-time') : [];
-                if (timeElements.length > 0) {
-                  timeElements.forEach(timeEl => {
-                    translateRelativeTimeEl(timeEl);
-                  });
-                }
-              }
+      for(let mutationRecord of mutations) {        
+        // 检测现有时间元素内容变化 - 如果内容变回英文则重新翻译
+        if (mutationRecord.type === 'characterData') {
+          // 查找包含变化文本节点的relative-time元素
+          let timeEl = mutationRecord.target.parentElement;
+          while (timeEl && timeEl.tagName !== 'RELATIVE-TIME') {
+            timeEl = timeEl.parentElement;
+          }
+          
+          if (timeEl) {
+            // 检查当前内容是否不包含中文
+            if (!/[\u4e00-\u9fa5]/.test(timeEl.textContent)) {
+              console.log('[翻译] 检测到时间元素内容变回英文，重新翻译:', timeEl.textContent);
+              // 延迟一点时间确保DOM稳定
+              setTimeout(() => {
+                translateRelativeTimeEl(timeEl);
+              }, 500);
             }
           }
         }
@@ -11709,11 +11708,6 @@
       // 当突变数量超过阈值时，重新翻译整个页面的时间
       if (mutations.length > 3) {
         console.log('[翻译] 检测到大量DOM变化，重新翻译时间格式');
-        setTimeout(translateTime, 500);
-        setTimeout(translateTime, 1000);
-        setTimeout(translateTime, 1000);
-        setTimeout(translateTime, 1000);
-        setTimeout(translateTime, 1000);
         setTimeout(translateTime, 1000);
       }
     });
