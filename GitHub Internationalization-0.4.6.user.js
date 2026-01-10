@@ -81,8 +81,8 @@
     "do not share my personal information": "不要分享我的个人信息",
     "manage cookies": "管理 Cookie",
     "new codespace": "新建代码空间",
-    "skip to content": "跳转到内容",
-    "this may take a few minutes to complete.": "这可能需要几分钟才能完成。",
+    "discussions": "讨论",
+    "wiki": "维基",
 
     "reduced pricing for github-hosted runners usage": "降低GitHub托管运行器使用定价",
     "all jobs":"所有作业",
@@ -11379,6 +11379,9 @@
       }, 1200);
     }
 
+    // 页面加载完成后统一翻译时间
+    console.log('[翻译] 页面加载完成，执行初始时间翻译');
+    setTimeout(translateTime, 2800); // 延迟2800ms确保所有DOM元素加载完成
   });
 
   // 监听页面路由变化（单页应用切换页面时）
@@ -11389,8 +11392,8 @@
     if (url !== lastUrl) {
       lastUrl = url;
       console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
-      // 页面路由变化后延迟500ms翻译时间，确保DOM更新完成
-      setTimeout(translateTime, 500);
+      // 页面路由变化后延迟800ms翻译时间，确保DOM更新完成
+      setTimeout(translateTime, 800);
 
       // 路由变化时检查是否需要重新排序文件(新增)
       setTimeout(() => {
@@ -11682,23 +11685,24 @@
     // 创建观察者实例
     const observer = new m(function (mutations, observer) {
       // 遍历所有突变记录
-      for(let mutationRecord of mutations) {        
-        // 检测现有时间元素内容变化 - 如果内容变回英文则重新翻译
-        if (mutationRecord.type === 'characterData') {
-          // 查找包含变化文本节点的relative-time元素
-          let timeEl = mutationRecord.target.parentElement;
-          while (timeEl && timeEl.tagName !== 'RELATIVE-TIME') {
-            timeEl = timeEl.parentElement;
-          }
-          
-          if (timeEl) {
-            // 检查当前内容是否不包含中文
-            if (!/[\u4e00-\u9fa5]/.test(timeEl.textContent)) {
-              console.log('[翻译] 检测到时间元素内容变回英文，重新翻译:', timeEl.textContent);
-              // 延迟一点时间确保DOM稳定
-              setTimeout(() => {
-                translateRelativeTimeEl(timeEl);
-              }, 500);
+      for(let mutationRecord of mutations) {
+        // 如果有新增节点或属性变化，对突变的目标元素进行翻译
+        if (mutationRecord.addedNodes || mutationRecord.type === 'attributes') {
+          traverseElement(mutationRecord.target);
+
+          // 特别处理时间元素：新增的time元素需要翻译
+          if (mutationRecord.addedNodes) {
+            for (let node of mutationRecord.addedNodes) {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                // 查找新增节点中的time元素
+                const timeElements = node.querySelectorAll ?
+                  node.querySelectorAll('relative-time') : [];
+                if (timeElements.length > 0) {
+                  timeElements.forEach(timeEl => {
+                    translateRelativeTimeEl(timeEl);
+                  });
+                }
+              }
             }
           }
         }
@@ -11706,9 +11710,9 @@
 
       // 重新翻译整个页面的时间（监听大量DOM变化时）
       // 当突变数量超过阈值时，重新翻译整个页面的时间
-      if (mutations.length > 3) {
+      if (mutations.length > 6) {
         console.log('[翻译] 检测到大量DOM变化，重新翻译时间格式');
-        setTimeout(translateTime, 1000);
+        setTimeout(translateTime, 1500);
       }
     });
 
@@ -11848,10 +11852,6 @@
   function translateTime() {
     // 查找所有relative-time元素并逐一翻译
     $("relative-time").each(function() {
-      // 如果当前元素内容已包含中文，则跳过翻译
-      if (/[\u4e00-\u9fa5]/.test(this.textContent)) {
-        return;
-      }
       translateRelativeTimeEl(this);
     });
   }
