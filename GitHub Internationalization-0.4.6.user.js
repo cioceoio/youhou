@@ -11709,7 +11709,12 @@
       // 当突变数量超过阈值时，重新翻译整个页面的时间
       if (mutations.length > 3) {
         console.log('[翻译] 检测到大量DOM变化，重新翻译时间格式');
-        setTimeout(translateTime, 3000);
+        setTimeout(translateTime, 500);
+        setTimeout(translateTime, 1000);
+        setTimeout(translateTime, 1000);
+        setTimeout(translateTime, 1000);
+        setTimeout(translateTime, 1000);
+        setTimeout(translateTime, 1000);
       }
     });
 
