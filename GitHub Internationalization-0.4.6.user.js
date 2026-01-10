@@ -11387,7 +11387,10 @@
   new MutationObserver(() => {
     const url = location.href;
     if (url !== lastUrl) {
-      lastUrl = url;
+      lastUrl = url;      
+      console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
+      // 页面路由变化后延迟500ms翻译时间，确保DOM更新完成
+      setTimeout(translateTime, 500);
 
       // 路由变化时检查是否需要重新排序文件(新增)
       setTimeout(() => {
@@ -11404,10 +11407,6 @@
           console.log('[翻译] 子目录页面已按文件更新日期排序');
         }
       }, 1500); // 延迟1.5s确保DOM更新完成
-      
-      console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
-      // 页面路由变化后延迟500ms翻译时间，确保DOM更新完成
-      setTimeout(translateTime, 500);
     }
   }).observe(document, {subtree: true, childList: true});
 
@@ -11708,9 +11707,9 @@
 
       // 重新翻译整个页面的时间（监听大量DOM变化时）
       // 当突变数量超过阈值时，重新翻译整个页面的时间
-      if (mutations.length > 12) {
+      if (mutations.length > 3) {
         console.log('[翻译] 检测到大量DOM变化，重新翻译时间格式');
-        setTimeout(translateTime, 600);
+        setTimeout(translateTime, 3000);
       }
     });
 
