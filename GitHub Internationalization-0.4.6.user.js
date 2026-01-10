@@ -83,13 +83,6 @@
     "new codespace": "新建代码空间",
     "skip to content": "跳转到内容",
     "this may take a few minutes to complete.": "这可能需要几分钟才能完成。",
-    "branch": "分支",
-    "updated": "更新",
-    "check status": "检查状态",
-    "Pull request": "拉取请求",
-    "behind": "落后",
-    "ahead": "领先",
-    "branch menu": "分支菜单",
 
     "reduced pricing for github-hosted runners usage": "降低GitHub托管运行器使用定价",
     "all jobs":"所有作业",
@@ -11395,9 +11388,6 @@
     const url = location.href;
     if (url !== lastUrl) {
       lastUrl = url;
-      console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
-      // 页面路由变化后延迟800ms翻译时间，确保DOM更新完成
-      setTimeout(translateTime, 800);
 
       // 路由变化时检查是否需要重新排序文件(新增)
       setTimeout(() => {
@@ -11414,6 +11404,10 @@
           console.log('[翻译] 子目录页面已按文件更新日期排序');
         }
       }, 1500); // 延迟1.5s确保DOM更新完成
+      
+      console.log('[翻译] 检测到页面路由变化，重新翻译时间格式');
+      // 页面路由变化后延迟500ms翻译时间，确保DOM更新完成
+      setTimeout(translateTime, 500);
     }
   }).observe(document, {subtree: true, childList: true});
 
@@ -11856,6 +11850,10 @@
   function translateTime() {
     // 查找所有relative-time元素并逐一翻译
     $("relative-time").each(function() {
+      // 如果当前元素内容已包含中文，则跳过翻译
+      if (/[\u4e00-\u9fa5]/.test(this.textContent)) {
+        return;
+      }
       translateRelativeTimeEl(this);
     });
   }
